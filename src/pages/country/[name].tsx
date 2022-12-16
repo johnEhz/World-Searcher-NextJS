@@ -1,30 +1,106 @@
-import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import Layout from '../../components/layout'
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import Link from "next/link";
+import Image from "next/image";
+import Layout from "../../components/layout";
+import Loading from "../../components/loading";
 
-import { getCountryByName } from '../../services/getCountryByName'
+//Service
+import { getCountryByName } from "../../services/getCountryByName";
+import { Country } from "../../types";
 
 const Country = () => {
-  const [country, setCountry] = useState<string | string[] | undefined>('')
+  const [error, setError] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [country, setCountry] = useState<Country>();
+  const [currentCountryName, setCurrentCountryName] = useState<
+    string | undefined
+  >("");
   const router = useRouter();
 
-  const loadCountry = async (countryName:string | string[] | undefined) => {
-    await getCountryByName(countryName).then(res => console.log(res))
-  }
+  const loadCountry = async (countryName: string | string[]) => {
+    setLoading(true);
+    await getCountryByName(countryName)
+      .then((res) => {
+        setCountry(res.data[0]);
+      })
+      .catch((err) => setError(true));
+    setLoading(false);
+  };
 
   useEffect(() => {
-    const { name } = router.query
-    setCountry(name);
-    country ? loadCountry(country) : null
-  }, [router.query])
+    const { name } = router.query;
+    setCountry;
+    name ? loadCountry(name) : null;
+    setCurrentCountryName(name?.toString());
+  }, [router]);
 
   return (
     <Layout>
-      <article>
-        Country id: {country}
+      <article className="px-4 text-black dark:text-neutral-200">
+        <div className="mt-10">
+          <Link
+            href="/"
+            className="bg-neutral-200 dark:bg-[#222E37] p-2 rounded-sm font-semibold flex max-w-[100px] justify-center hover:bg-neutral-300 dark:hover:bg-[#192229] transition-colors"
+          >
+            ← Back
+          </Link>
+        </div>
+        {loading ? (
+          <Loading />
+        ) : error ? (
+          <h1 className="text-center mt-20 text-xl">
+            Country with name{" "}
+            <span className="font-bold tracking-wider italic">
+              {currentCountryName?.toUpperCase()}
+            </span>{" "}
+            was not founded...
+          </h1>
+        ) : country ? (
+          <div className="flex flex-col gap-10">
+            <div className="w-full flex justify-center mt-6">
+              <Image
+                className="w-full h-full rounded-t-md max-w-xl"
+                src={country.flags.png}
+                alt={country.name.official}
+                width={400}
+                height={300}
+              />
+            </div>
+            <div className="flex flex-col gap-6">
+              <h1 className="font-bold text-lg">{country.name.official}</h1>
+              <div className="flex flex-col gap-3">
+                <h2>
+                  <span className="font-semibold">Native Name:</span>{" "}
+                  {country.name.common}
+                </h2>
+                <h2>
+                  <span className="font-semibold">Population:</span>{" "}
+                  {country.population}
+                </h2>
+                <h2>
+                  <span className="font-semibold">Region:</span>{" "}
+                  {country.region}
+                </h2>
+                <h2>
+                  <span className="font-semibold">Sub Region:</span>{" "}
+                  {country.subregion}
+                </h2>
+                <h2 className="flex gap-1">
+                  <span className="font-semibold">Capital/s:</span>
+                  <ul className="flex gap-3">
+                    {country.capital.map((cap, index) => (
+                      <li key={`${cap}-${index}`}>{cap}</li>
+                    ))}
+                  </ul>
+                </h2>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </article>
     </Layout>
-  )
-}
+  );
+};
 
-export default Country
+export default Country;

@@ -5,14 +5,17 @@ import Loading from "../components/loading";
 import { AiOutlineSearch } from "react-icons/ai";
 import { ChangeEvent, useEffect, useState } from "react";
 import { Country, Query } from "../types";
-
 //Services
 import { getAllCountries } from "../services/getAllCountryes";
-
 //List of countryes
 const Countries = lazy(() => import("../components/Country/countries"));
 
-export default function Home() {
+interface HomeProps {
+  data: Country[]
+}
+
+
+export default function Home({ data }: HomeProps) {
   const [countries, setCountries] = useState<Country[]>();
   const [renderedCountries, setRenderedCountries] = useState<Country[]>();
   const [query, setQuery] = useState<Query>({
@@ -20,15 +23,10 @@ export default function Home() {
     regionName: "all",
   });
 
-  const loadCountries = async () => {
-    await getAllCountries().then((res) => {
-      setCountries(res.data);
-    });
-  };
 
   useEffect(() => {
-    loadCountries();
-  }, []);
+    setCountries(data)
+  }, [data]);
 
   useEffect(() => {
     setRenderedCountries(
@@ -109,3 +107,9 @@ export default function Home() {
     </>
   );
 }
+
+export async function getServerSideProps() {
+  const data = await getAllCountries().then(res => (res.data));
+  return { props: { data } }
+}
+
