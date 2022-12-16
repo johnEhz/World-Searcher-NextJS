@@ -1,19 +1,24 @@
+import { lazy } from "react";
 import Head from "next/head";
 import Layout from "../components/layout";
+import Loading from "../components/loading";
 import { AiOutlineSearch } from "react-icons/ai";
-import { useEffect, useState } from "react";
-import { Country } from "../types";
+import { ChangeEvent, useEffect, useState } from "react";
+import { Country, Query } from "../types";
 
 //Services
 import { getAllCountries } from "../services/getAllCountryes";
 
 //List of countryes
-import Countries from "../components/Country/countries";
+const Countries = lazy(() => import("../components/Country/countries"));
 
 export default function Home() {
   const [countries, setCountries] = useState<Country[]>();
-  const [region, setRegion] = useState<string>();
-  const [searchCountry, setSearchCountry] = useState<string>('')
+  const [renderedCountries, setRenderedCountries] = useState<Country[]>();
+  const [query, setQuery] = useState<Query>({
+    countryName: "",
+    regionName: "all",
+  });
 
   const loadCountries = async () => {
     await getAllCountries().then((res) => {
@@ -23,17 +28,29 @@ export default function Home() {
 
   useEffect(() => {
     loadCountries();
-    setRegion("all");
-    console.log("Running code")
   }, []);
 
-  const handleChangeSearchCuntry = (e:ChangeEvent<HTMLInputElement>) => {
-    setSearchCountry(e.target.value)
-    console.log(searchCountry)
-  }
+  useEffect(() => {
+    setRenderedCountries(
+      countries?.filter(
+        (country) =>
+          country.name.common
+            .toLowerCase()
+            .includes(query.countryName.toLowerCase()) &&
+          (query.regionName === "all" ||
+            query.regionName.toLowerCase() === country.region.toLowerCase())
+      )
+    );
+  }, [query, countries]);
+
+  const handleChangeQuery = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setQuery({ ...query, [e.target.name]: e.target.value });
+  };
 
   return (
-    <div className="page-container w-full bg-gray-100 dark:bg-[#283641]">
+    <>
       <Head>
         <title>World country searcher</title>
         <meta charSet="utf-8" />
@@ -56,28 +73,39 @@ export default function Home() {
                 type="text"
                 placeholder="Search for a country..."
                 className="py-4 px-3 w-full outline-none"
-                onChange={handleChangeSearchCuntry}
-                value={searchCountry}
+                onChange={handleChangeQuery}
+                name="countryName"
+                value={query.countryName}
               />
             </div>
             <select
-              name="region"
+              name="regionName"
               id="region"
-              value={region}
-              onChange={(e) => setRegion(e.target.value)}
+              value={query.regionName}
+              onChange={handleChangeQuery}
               className="rounded-md px-6 max-w-[250px] w-full h-14 cursor-pointer outline-none shadow-md text-neutral-500"
             >
               <option value="all">All</option>
               <option value="africa">Africa</option>
-              <option value="america">America</option>
+              <option value="americas">America</option>
               <option value="asia">Asia</option>
               <option value="europe">Europe</option>
               <option value="oceania">Oceania</option>
             </select>
           </div>
-          <Countries countries={countries} />
+          {
+          renderedCountries ?
+          (
+            <>
+              {
+                renderedCountries.length ?
+                  (<Countries countries={renderedCountries} />) :
+                  (<h1 className="text-black dark:text-white tracking-wider">No se encontraron paises...</h1>)
+              }
+            </>
+          ) : <Loading />}
         </section>
       </Layout>
-    </div>
+    </>
   );
 }

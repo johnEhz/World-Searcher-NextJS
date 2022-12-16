@@ -12,5 +12,9 @@ export interface Country {
     flags: {
         png: string
     }
+}
 
+export interface Query {
+    countryName: string,
+    regionName: string
 }

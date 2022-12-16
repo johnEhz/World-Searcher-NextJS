@@ -1,8 +1,8 @@
 import React from "react";
 import Image from "next/image";
 import { useRouter } from 'next/router'
-
 import { Country } from "../../types";
+
 
 interface CountryProps {
   country: Country;
@@ -13,7 +13,10 @@ const Country = ({ country }: CountryProps) => {
 
   return (
     <article
-      onClick={() => router.push(`/country/${country.name.common}`)}
+      onClick={() => router.push({
+        pathname: `/country/[name]`,
+        query: {name: country.name.common}
+      })}
       className="rounded-md shadow-lg shadow-neutral-300 dark:shadow-neutral-800 bg-white dark:bg-[#1d272f] flex flex-col cursor-pointer hover:scale-[1.02] transition-transform text-black dark:text-neutral-200">
       <header className="h-60 border-b dark:border-neutral-600">
         <Image
