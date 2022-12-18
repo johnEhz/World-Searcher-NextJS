@@ -113,11 +113,15 @@ const Country = () => {
                   </h2>
                   <h2 className="flex gap-1">
                     <span className="font-semibold">Capital/s:</span>
-                    <ul className="flex gap-3">
-                      {country.capital.map((cap, index) => (
-                        <li key={`${cap}-${index}`}>{cap}</li>
-                      ))}
-                    </ul>
+                    {
+                      country.capital ?
+                      (
+                      <ul className="flex gap-3">
+                        {country.capital.map((cap, index) => (
+                          <li key={`${cap}-${index}`}>{cap}</li>
+                        ))}
+                      </ul>) : "No avaible"
+                    }
                   </h2>
                 </div>
                 {country.borders ? (

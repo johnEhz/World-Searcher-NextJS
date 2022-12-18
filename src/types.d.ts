@@ -7,7 +7,7 @@ export interface Country {
     region: string,
     subregion: string,
     borders?: string[],
-    capital: string[],
+    capital?: string[],
     flags: {
         png: string
     }
