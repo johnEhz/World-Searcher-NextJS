@@ -66,8 +66,18 @@ const Country = () => {
               </span>{" "}
               was not founded...
             </h1>
-            <small className="italic">
+            <h4 className="italic">
               Try typing the name in English or only the shortly name.
+            </h4>
+            <small>
+              Possible solution:{" "}
+              <Link
+                href={`/country/${currentCountryName?.split(" ")[0]}`}
+                className="text-green-500 hover:border-b border-green-500"
+                target="_blank"
+              >
+                {currentCountryName?.split(" ")[0]}
+              </Link>
             </small>
           </div>
         ) : country ? (
@@ -110,25 +120,31 @@ const Country = () => {
                     </ul>
                   </h2>
                 </div>
-                <div className="flex flex-col gap-5 justify-center items-center">
-                  <h1 className="w-full text-center font-bold">Fronteras</h1>
-                  <ul className="grid grid-cols-5 max-w-3xl w-full gap-3">
-                    {country.borders.map((border) => (
-                      <li
-                        key={border}
-                        className="flex justify-center items-center"
-                      >
-                        <button
-                          onClick={() => handleNavigateBorders(border)}
-                          className="bg-neutral-200 dark:bg-[#222E37] py-2 px-4 rounded-md font-semibold flex max-w-[100px] justify-center hover:bg-neutral-300 dark:hover:bg-[#192229] transition-colors"
-                          value={border}
+                {country.borders ? (
+                  <div className="flex flex-col gap-5 justify-center items-center">
+                    <h1 className="w-full text-center font-bold">Fronteras</h1>
+                    <ul className="grid grid-cols-5 max-w-3xl w-full gap-3 border border-neutral-700 py-3 rounded-md">
+                      {country.borders.map((border) => (
+                        <li
+                          key={border}
+                          className="flex justify-center items-center"
                         >
-                          {border}
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                          <button
+                            onClick={() => handleNavigateBorders(border)}
+                            className="bg-neutral-200 dark:bg-[#222E37] py-2 px-4 rounded-md font-semibold flex max-w-[100px] justify-center hover:bg-neutral-300 dark:hover:bg-[#192229] transition-colors"
+                            value={border}
+                          >
+                            {border}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <h1 className="text-red-400">
+                    The country has no borders...
+                  </h1>
+                )}
               </div>
             </div>
           </div>

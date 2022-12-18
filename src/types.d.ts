@@ -6,7 +6,7 @@ export interface Country {
     population: number,
     region: string,
     subregion: string,
-    borders: string[],
+    borders?: string[],
     capital: string[],
     flags: {
         png: string
